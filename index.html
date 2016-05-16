@@ -27,63 +27,71 @@
 				<section>
 				  <section>Hi</section>
 				  <section>I am Victor</section>
-          <section><p>I work at sportsbet.com.au</p>
-            <p  class="fragment fade-up">at SolAr (Solution Architecture and Engineering) team.</p></section>
+          <section><p>I work at</p>
+						<img src="sb_logo.png" border="0">
+            <p class="fragment fade-up">SolAr (Solution Architecture and Engineering) team</p>
+					</section>
 				</section>
 				<section>
           <section>Let's talk about building a private Docker Registry...</section>
           <section><p>But before that</p>
-            <p  class="fragment fade-up">bit of a diversion.</p></section>
+            <p  class="fragment fade-up">bit of a diversion</p></section>
           <section>There is a discipline called ТРИЗ (TRIZ)...</section>
           <section><p>TRIZ stands for "Theory of Solving Invention-related problems"</p>
-            <p class="fragment fade-up">when translated from Russian.</p></section>
-          <section>It was created by Genrich Altshuller and his colleagues in the USSR in the mid XX century...</section>
-          <section>...and is widely in use nowadays.</section>
+            <p class="fragment fade-up">when translated from Russian</p></section>
+          <section>It was created by Genrich Altshuller and others in the USSR in the mid XX century...</section>
+          <section>...and still in use nowadays</section>
           <section>You can read more about TRIZ on Wikipedia https://en.wikipedia.org/wiki/TRIZ</section>
-          <section><p>For our conversation today, however</p>
-            <p  class="fragment fade-up">all you need to know about TRIZ</p>
-            <p class="fragment fade-up">that it says the following...</p></section>
-          <section><p>At the heart of any [technical] problem</p>
-            <p  class="fragment fade-up">there is one or more</p>
-            <p class="fragment fade-up"><span class="fragment highlight-red">contradiction</span></p></section>
-          <section><p>A TRIZ-savvy person solves a given problem</p>
-            <p class="fragment fade-up">by identifying and eliminating all its contradictions</p>
+          <section><p>For our conversation today, however you need to know</p>
+            <p  class="fragment fade-up">one of the main principles of TRIZ</p>
+            <p class="fragment fade-up">which says...</p></section>
+          <section><p>At the heart of any [technical] problem<br>
+            <span class="fragment fade-up">there is one or more conflict</span><br>
+            <span class="fragment fade-up">or <span class="fragment highlight-red">contradiction</span></span></p></section>
+          <section><p>A TRIZ-savvy person solves a given problem by<br>
+						<ul>
+            <li class="fragment fade-up">identifying</li>
+						<li class="fragment fade-up">and eliminating</li>
+						<span class="fragment fade-up">all its contradictions</span></p>
           </section>
           <section>Shall we now? <span class="fragment fade-up">:-)</span></section>
           <section>Here is a  classical TRIZ example</section>
           <section>It is called <span class="fragment fade-up">"To See Through the Wall"</span></section>
-          <section><p>Imagine a water pipe. <span class="fragment fade-up">Say a copper one...</span></p>
-          <p class="fragment fade-up">You need to determine which direction the water flows inside.</p></section>
+          <section><p>Imagine a water pipe. <span class="fragment fade-up">Say, a copper one...</span></p>
+          <p class="fragment fade-up">You need to determine which direction water flows inside it.</p></section>
           <section>
-            <p>The contradiction here is between</p>
-            <p  class="fragment fade-up">your sight</p>
-            <p class="fragment fade-up">and</p>
-            <p class="fragment fade-up">the pipe material</p></section>
-          <section><p>Remember that you are in the middle of the XX century.</p>
+            <p>The contradiction here is between<span class="fragment highlight-blue">...</span><br>
+            <span  class="fragment fade-up">your sight</span>
+            <span class="fragment fade-up">and the pipe material</span></p></section>
+          <section><p>Remember that you are in the middle of the XX century</p>
             <p class="fragment fade-up">So use your force...</p>
           </section>
-          <section>
-            I mean, use your senses.
+          <section data-transition="fade">
+            I mean, use your senses<span class="fragment highlight-blue">...</span>
           </section>
-          <section>Let's apply the TRIZ contradiction principle to our Docker solution.</section>
 				</section>
         <section>
-          <section>Imagine the situation where you decided to implement a local Docker Registry</section>
-          <section>Actually that will be an answer to a particular problem</section>
-          <section><p>And, therefore, a particular set of contradictions</p>
-            <p class="fragment fade-up">Those could be</p>
-            <p class="fragment fade-up">Your security requirements vs data stored on the Internet</p>
-            <p class="fragment fade-up">Individual vs team work</p>
-            <p class="fragment fade-up">and so on</p>
+          <section>Let's now apply the TRIZ Contradiction Principle closer to the topic of our Meetup today</section>
+          <section>Imagine a situation where you decided to implement a local Docker Registry</section>
+          <section>Actually that will be an answer to a particular problem or problems</section>
+          <section><p>And, therefore, to a particular set of contradictions</p>
+            <p class="fragment fade-up">For example<span class="fragment highlight-blue">...</span></p>
+						<ul>
+            <li class="fragment fade-up">Your security requirements vs data stored on the Internet</li>
+            <li class="fragment fade-up">Individual vs team work</li>
+            <li class="fragment fade-up">etc</li>
+					  </ul>
           </section>
           <section>
-            <p>You solved that problem by identifying a need for a local Docker Registry.</p>
-            <p class="fragment fade-up">Further to that</p>
-            <p class="fragment fade-up">You have ruled out off-the-shelf solutions</p>
-            <p class="fragment fade-up">i.e. Nexus, Artifactory</p>
+            You solved those problems by identifying a need for a local Docker Registry.
           </section>
-          <section>Instead you decided to go with the official one from Docker.</section>
-          <section>Your soution is based on a single CentOS 7 server</section>
+					<section>
+            <p> Further to that
+            <span class="fragment fade-up"> you ruled out off-the-shelf solutions </span><br>
+            <span class="fragment fade-up">i.e. Nexus, Artifactory</span></p>
+          </section>
+          <section>Instead you decided to go with the official one from the Docker team</section>
+          <section>Your solution is based on a single CentOS 7 server</section>
           <section>Let's go ahead and get it up and running</section>
         </section>
         <section>
@@ -182,25 +190,21 @@ latest: digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893b
           <section>Let's see if we can retrieve this image back...</section>
           <section>
             <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
-            <code># removing the local copy of the buxybox:
-
+            <code>
+# removing the local copy of the buxybox:
 [root@dckrepc701s2 opt]$ docker rmi localhost.localdomain:5000/busybox
 Untagged: localhost.localdomain:5000/busybox:latest
-
 
 [root@dckrepc701s2 opt]$ docker rmi docker.io/busybox
 Untagged: docker.io/busybox:latest
 Deleted: fef924a0204a00b3ec67318e2ed337b189c99ea19e2bf10ed30a13b87c5e17ab
 Deleted: 9a163e0b8d138ec700b5a5f7e62509012f7eb34b9f86cd3bbeb3d183958114a9
 
-
 # checking our local images:
 [root@dckrepc701s2 opt]# docker images
 REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
 
-
 # No local images. Let's pull busybox from our private Docker Registry:
-
 [root@dckrepc701s2 opt]$ docker pull localhost.localdomain:5000/busybox
 Using default tag: latest
 Trying to pull repository localhost.localdomain:5000/busybox ... latest: Pulling from busybox
@@ -214,13 +218,17 @@ docker.io/distribution/registry      latest              4c828131f8d1        11 
           </section>
           <section>Yay!<span class="fragment fade-up"> Job done!</span></section>
           <section>Job done?</section>
-          <section>What's the contradiction?</section>
-          <section><p>We want the Docker Registry to be available on the server restart</p>
-            <p class="fragment fade-up">however currently we start it manually.</p>
-            <p class="fragment fade-up">Let's fix that.</p>
+          <section>What's the contradiction?<span class="fragment highlight-blue">...</span></section>
+          <section><p>We want the Docker Registry to be available on the server restart<br>
+            <span class="fragment fade-up">however currently we start it manually</span>
           </section>
-					<section><p>Since we are on CentOS 7 we will use the Systemd approach.</p>
-            <p class="fragment fade-up">Let's create a unit file.</p>
+				  <section>
+            Let's fix that
+					</section>
+					<section>Since we are on CentOS 7 we will use a Systemd approach
+          </section>
+				  <section>
+            Let's create a systemd unit file
           </section>
 					<section data-transition="slide fade">
 						<p>/usr/lib/systemd/system/docker.registry.service</p>
@@ -245,10 +253,10 @@ ExecStart=-/bin/docker run -d -p 5000:5000 \
 WantedBy=multi-user.target
 							</code>
 					  </pre>
-            <p class="fragment fade-up">There are few interesting things there:<br>
-							<span class="fragment fade-up">We make sure that there is no existing instance of the Docker Register is running. </span>
-							<span class="fragment fade-up">Then we pull a fresh copy (if needed). </span>
-							<span class="fragment fade-up">Hence the ExecStartPre.</span>
+            <p class="fragment fade-up">There are few interesting things here:<br>
+							<span class="fragment fade-up">We make sure there are no eisting instances of the Docker Register currently running, </span>
+							<span class="fragment fade-up">then we pull a fresh copy (if needed) - </span>
+							<span class="fragment fade-up">hence the ExecStartPre</span>
 						</p>
 					</section>
 					<section data-transition="fade">
@@ -274,8 +282,8 @@ ExecStart=-/bin/docker run -d -p 5000:5000 \
 WantedBy=multi-user.target
 							</code>
 					  </pre>
-            <p class="fragment fade-up">We use "=-" to ignore the non-zero exit code of ExecStartPre commands
-(in case there is no instance exists).<br>
+            <p>We use "=-" to ignore the non-zero exit code of ExecStartPre commands
+(in case there is no instance exists)<br>
 						<span class="fragment fade-up">ExecStart is exactly the same command as we run from the bash prompt.</span>
 </p>
 					</section>
@@ -302,12 +310,12 @@ ExecStart=-/bin/docker run -d -p 5000:5000 \
 WantedBy=multi-user.target
 							</code>
 					  </pre>
-            <p class="fragment fade-up">What will be the problem with this approach?</p>
+            <p>What will be the problem with this approach?</p>
             <p class="fragment fade-up">
 							What behaviour we will see? (Hint: "Restart=always")
 						</p>
             <p class="fragment fade-up">
-							What's the <span class="fragment highlight-red">contradiction</span>?
+							What's the <span class="fragment highlight-red">contradiction</span>?<span class="fragment highlight-blue">...</span>
 						</p>
 					</section>
 					<section data-transition="fade">
@@ -333,12 +341,15 @@ ExecStart=-/bin/docker run -d -p 5000:5000 \
 WantedBy=multi-user.target
 							</code>
 					  </pre>
-            <p class="fragment fade-up">
-							It will go into a start-stop loop.
+            <p>
+							It will go into a start-stop loop
 						</p>
             <p class="fragment fade-up">
-							The contradiction here is between "Type=simple" and "-d". Let's eliminate it - either with "Type=forking" (and setting a "PIDFile") or remove "-d"
-						</p>
+							The contradiction here is between "Type=simple" and "-d" </p>
+					</section>
+					<section>
+            <p>Let's eliminate it - either with "Type=forking" (and setting a "PIDFile")<br>
+						<span class="fragment fade-up"> or by removing "-d"</span></p>
 					</section>
 					<section data-transition="slide fade">
 						<p>/usr/lib/systemd/system/docker.registry.service</p>
@@ -363,14 +374,14 @@ ExecStart=-/bin/docker run -p 5000:5000 \
 WantedBy=multi-user.target
 							</code>
 					  </pre>
-            <p class="fragment fade-up">
-							We removed '-d'.
+            <p>
+							We removed '-d'
 						</p>
             <p class="fragment fade-up">
 							All good? <span class="fragment fade-up">No!</span>
 						</p>
             <p class="fragment fade-up">
-							What's our next problem /contradiction?
+							What's our next problem /contradiction?<span class="fragment highlight-blue">...</span>
 						</p>
 					</section>
 					<section data-transition="fade">
@@ -400,9 +411,9 @@ WantedBy=multi-user.target
 							Systemd is supposed to mind the actual Docker Registry container, however it minds the docker client.
 I.e. if docker client dies, docker instance will continue to run.
 						</p>
-            <p class="fragment fade-up">
+					</section>
+					<section>
 							The contradiction is between docker client and systemd.
-						</p>
 					</section>
 					<section>
 						Let's fix that by using systemd-docker https://github.com/ibuildthecloud/systemd-docker
@@ -424,7 +435,7 @@ I.e. if docker client dies, docker instance will continue to run.
 								Copy the systemd-docker binary to /bin
 							</li>
             	<li class="fragment fade-up">
-								Update docker.registry.service unit file.
+								Update docker.registry.service unit file
 							</li>
 						</ul>
 						<p>
@@ -456,7 +467,7 @@ WantedBy=multi-user.target
 							</code>
 					  </pre>
             <p>
-							Now we can update the unit file as the above. Notice "Type=notify", "--name %n"
+							Now we can update the unit file as the above.<br> Notice "Type=notify", "--name %n"
 						</p>
 					</section>
 					<section data-transition="fade">
@@ -520,18 +531,18 @@ To run with the updated configuration do<br> "systemctl daemon-reload && systemc
 							What has just happened? <span class="fragment fade-up">Why we see this error?</span>
 						</p>
             <p class="fragment fade-up">
-							What is the <span class="fragment highlight-red">contradiction</span>?
+							What is the <span class="fragment highlight-red">contradiction</span>?<span class="fragment highlight-blue">...</span>
 						</p>
 					</section>
 					<section>
 						<p>
 							We are trying to use an insecure registry.
 						</p>
-            <p class="fragment fade-up">
-							The contradiction is between the docker client,<br> which expects TLS
-						</p>
-            <p class="fragment fade-up">
-							and the server,<br> which is currently deployed with the plain HTTP.
+					</section>
+					<section data-transition="fade">
+            <p>
+							The contradiction is between the docker client, which expects TLS<br>
+            <span class="fragment fade-up">and the Registry server, which is currently deployed with the plain old HTTP</span>
 						</p>
 					</section>
 					<section>
@@ -546,6 +557,9 @@ To run with the updated configuration do<br> "systemctl daemon-reload && systemc
 						</p>
 					</section>
 					<section>
+            <p>
+						  Creating a self-signing certificate:
+						</p>
 						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
 		<code>
 [root@dckrepc701s2 opt]# mkdir -p /opt/certs &amp;&amp; cd /opt/certs
@@ -566,9 +580,6 @@ Email Address []:
 
 [root@dckrepc701s2 certs]# ls
 domain.crt&nbsp; domain.key</code></pre>
-            <p class="fragment fade-up">
-						  Here we are creating a self-signing certificate.
-						</p>
 					</section>
 					<section>
 						Next we need to update the unit file,
@@ -622,7 +633,7 @@ latest: digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893b
 						  It worked! <span class="fragment fade-up">However...</span>
 						</p>
             <p class="fragment fade-up">
-						  Can you see a problem/contradiction with this setup?
+						  Can you see a problem/contradiction with this setup?<span class="fragment highlight-blue">...</span>
 						</p>
 					</section>
 					<section>
@@ -630,7 +641,7 @@ latest: digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893b
 							We need to distribute our public key to each and every Docker client...
 						</p>
             <p class="fragment fade-up">
-						  ... and it is even trickier with the docker-machine on Mac and Windows.
+						  ... and it is even trickier with the docker-machine on Mac and Windows
 						</p>
 					</section>
 					<section>
@@ -638,7 +649,7 @@ latest: digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893b
 						and our desire to minimize the effort when setting up / maintaining  Docker
 					</section>
 					<section>
-						Let's eliminate it by using a proper CA-signed TLS certificate.
+						Let's eliminate it by using a proper CA-signed TLS certificate
 					</section>
 					<section>
 						<p>Like this one:</p>
@@ -646,34 +657,39 @@ latest: digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893b
 					</section>
 					<section>
 						<p>
-							Suppose I replaced the content of the domain.crt and domain.key, restarted docker.registry.service.
+							Suppose I replaced the content of the domain.crt and domain.key and<br> restarted docker.registry.service
 					  </p>
             <p class="fragment fade-up">
-						  However I still have the same TLS error as before.
+						  However I still have the same TLS error as before
 						</p>
             <p class="fragment fade-up">
-						  What is the issue?
+						  What is the issue?<span class="fragment highlight-blue">...</span>
 						</p>
 					</section>
 					<section>
 						<p>
-							Our certificate is signed by the DigiCert via an intermediate DigiCert SHA2 Secure Server CA.
+							Our certificate is signed by the DigiCert via an intermediate DigiCert SHA2 Secure Server CA...
 					  </p>
             <p class="fragment fade-up">
-						  The latter one is not included in the standard list of the Certification Authorities - hence the error.
+						  ...which is not included in the standard list of the Certification Authorities
+						</p>
+            <p class="fragment fade-up">
+						  The SSL chain is broken with the middle link missing - hence the error.
 						</p>
 					</section>
 					<section>
 						<p>
-							Concatenating public key and the intermediate certificate in one .crt usually helps...
+							Concatenating public key and the intermediate certificate in one '.crt' file usually helps...
 					  </p>
             <p class="fragment fade-up">
-						  But not in this case.
-							<span class="fragment fade-up"The Registry expects to see only the public key in REGISTRY_HTTP_TLS_CERTIFICATE.</span>
+						  But not in this case
 						</p>
-            <p class="fragment fade-up">
-						  What's the solution?
-						</p>
+					</section>
+					<section>
+							The Registry expects to see only one public key in the REGISTRY_HTTP_TLS_CERTIFICATE
+					</section>
+					<section>
+						  What's the solution?<span class="fragment highlight-blue">...</span>
 					</section>
 					<section>
 						Let's place an HTTPS reverse proxy in front of the Docker Registry.
@@ -683,14 +699,15 @@ latest: digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893b
 					</section>
 					<section>
 						<p>
-							<img src="diagram1.png"
+							The diagram:
 						</p>
+							<img src="diagram1.png">
 					</section>
 					<section>
 						<p>Here are the steps:
 						<ul>
             	<li class="fragment fade-up">
-								Create a DNS entry as per the certificate CN
+								Create a DNS entry as per the certificate CN (or other way around)
 							</li>
             	<li class="fragment fade-up">
 								Obtain CA-signed certificate
@@ -838,12 +855,12 @@ Status: Downloaded newer image for dockerhub.sbetcorp.com.au:443/victor/true:mya
 				</section>
 				<section>
 					<section>
-						Can anyone suggest what's our next issue / contradiction?
+						Can anyone suggest what's our next issue / contradiction?<span class="fragment highlight-blue">...</span>
 					</section>
 					<section>
-						<p>At time of writing there was no easy way to search the local Docker Registry.</p>
+						<p>At time of writing there was no easy way to search a local Docker Registry...</p>
             <p class="fragment fade-up">
-							See https://github.com/docker/distribution/issues/206
+							...apart from listing the catalogue via an API call (/v2/_catalog)
 						</p>
 					</section>
 					<section>
