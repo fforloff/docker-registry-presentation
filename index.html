@@ -1,0 +1,991 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+				  <section>Hi</section>
+				  <section>I am Victor</section>
+          <section><p>I work at sportsbet.com.au</p>
+            <p  class="fragment fade-up">at SolAr (Solution Architecture and Engineering) team.</p></section>
+				</section>
+				<section>
+          <section>Let's talk about building a private Docker Registry...</section>
+          <section><p>But before that</p>
+            <p  class="fragment fade-up">bit of a diversion.</p></section>
+          <section>There is a discipline called ТРИЗ (TRIZ)...</section>
+          <section><p>TRIZ stands for "Theory of Solving Invention-related problems"</p>
+            <p class="fragment fade-up">when translated from Russian.</p></section>
+          <section>It was created by Genrich Altshuller and his colleagues in the USSR in the mid XX century...</section>
+          <section>...and is widely in use nowadays.</section>
+          <section>You can read more about TRIZ on Wikipedia https://en.wikipedia.org/wiki/TRIZ</section>
+          <section><p>For our conversation today, however</p>
+            <p  class="fragment fade-up">all you need to know about TRIZ</p>
+            <p class="fragment fade-up">that it says the following...</p></section>
+          <section><p>At the heart of any [technical] problem</p>
+            <p  class="fragment fade-up">there is one or more</p>
+            <p class="fragment fade-up"><span class="fragment highlight-red">contradiction</span></p></section>
+          <section><p>A TRIZ-savvy person solves a given problem</p>
+            <p class="fragment fade-up">by identifying and eliminating all its contradictions</p>
+          </section>
+          <section>Shall we now? <span class="fragment fade-up">:-)</span></section>
+          <section>Here is a  classical TRIZ example</section>
+          <section>It is called <span class="fragment fade-up">"To See Through the Wall"</span></section>
+          <section><p>Imagine a water pipe. <span class="fragment fade-up">Say a copper one...</span></p>
+          <p class="fragment fade-up">You need to determine which direction the water flows inside.</p></section>
+          <section>
+            <p>The contradiction here is between</p>
+            <p  class="fragment fade-up">your sight</p>
+            <p class="fragment fade-up">and</p>
+            <p class="fragment fade-up">the pipe material</p></section>
+          <section><p>Remember that you are in the middle of the XX century.</p>
+            <p class="fragment fade-up">So use your force...</p>
+          </section>
+          <section>
+            I mean, use your senses.
+          </section>
+          <section>Let's apply the TRIZ contradiction principle to our Docker solution.</section>
+				</section>
+        <section>
+          <section>Imagine the situation where you decided to implement a local Docker Registry</section>
+          <section>Actually that will be an answer to a particular problem</section>
+          <section><p>And, therefore, a particular set of contradictions</p>
+            <p class="fragment fade-up">Those could be</p>
+            <p class="fragment fade-up">Your security requirements vs data stored on the Internet</p>
+            <p class="fragment fade-up">Individual vs team work</p>
+            <p class="fragment fade-up">and so on</p>
+          </section>
+          <section>
+            <p>You solved that problem by identifying a need for a local Docker Registry.</p>
+            <p class="fragment fade-up">Further to that</p>
+            <p class="fragment fade-up">You have ruled out off-the-shelf solutions</p>
+            <p class="fragment fade-up">i.e. Nexus, Artifactory</p>
+          </section>
+          <section>Instead you decided to go with the official one from Docker.</section>
+          <section>Your soution is based on a single CentOS 7 server</section>
+          <section>Let's go ahead and get it up and running</section>
+        </section>
+        <section>
+          <section><p>The Registry itself comes as a Docker image</p>
+            <p class="fragment fade-up">therefore we need to get the Docker engine up and running first</p>
+          </section>
+          <section>
+            <p>Here are the steps</p>
+            <p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            <code>
+[appsdeploy@dckrepc701s2 ~]$ sudo yum update
+...
+
+[appsdeploy@dckrepc701s2 ~]$ sudo tee /etc/yum.repos.d/docker.repo &lt;&lt;-'EOF'
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+EOF
+...
+
+[appsdeploy@dckrepc701s2 ~]$ sudo yum install docker-engine
+...
+
+[appsdeploy@dckrepc701s2 ~]$ sudo systemctl enable docker
+...
+
+[appsdeploy@dckrepc701s2 ~]$ sudo systemctl start docker
+...
+docker.service - Docker Application Container Engine
+Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; vendor preset: disabled)
+Active: active (running) since Fri 2016-02-26 10:28:06 ACST; 2min 40s ago
+...
+</code>
+            </pre>
+            </p>
+          </section>
+          <section>
+            <p>Next we pull the Registry image and run an instance...</p>
+            <p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            <code>
+[appsdeploy@dckrepc701s2 ~]$ sudo mkdir -p /data/docker_data/registry
+...
+
+[appsdeploy@dckrepc701s2 ~]$ sudo docker pull distribution/registry
+...
+
+[appsdeploy@dckrepc701s2 ~]$ sudo docker images
+
+REPOSITORY TAG IMAGE ID CREATED VIRTUAL SIZE
+docker.io/distribution/registry latest 4c828131f8d1 11 weeks ago 666.4 MB
+
+[appsdeploy@dckrepc701s2 ~]$ docker run -d -p 5000:5000  \
+> -v /opt/docker_data/registry:/var/lib/registry \
+> --name docker_registry docker.io/distribution/registry
+
+[appsdeploy@dckrepc701s2 ~]$ sudo docker ps
+CONTAINER ID        IMAGE                                      COMMAND                  CREATED             STATUS              PORTS                          NAMES
+9b71cc089f76        docker.io/distribution/registry            "registry /etc/docker"   26 seconds ago      Up 24 seconds     5000/tcp           docker_registry
+</code>
+            </pre></p>
+          </section>
+          <section>Let's test it</section>
+          <section>
+            <p>We pull a busybox image from the docker.io and store it locally:</p>
+            <p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            <code>[root@dckrepc701s2 opt]$ docker pull busybox
+Using default tag: latest
+Trying to pull repository docker.io/library/busybox ... latest: Pulling from library/busybox
+9a163e0b8d13: Pull complete
+fef924a0204a: Pull complete
+...
+Status: Downloaded newer image for docker.io/busybox:latest
+
+[root@dckrepc701s2 opt]$ docker images
+REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+docker.io/busybox                 latest              fef924a0204a        9 days ago          1.114 MB
+
+[root@dckrepc701s2 opt]$ docker tag fef924a0204a localhost.localdomain:5000/busybox
+[root@dckrepc701s2 opt]$ docker images
+REPOSITORY                           TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+docker.io/busybox                    latest              fef924a0204a        9 days ago          1.114 MB
+localhost.localdomain:5000/busybox   latest              fef924a0204a        9 days ago          1.114 MB
+
+[root@dckrepc701s2 opt]$ docker push localhost.localdomain:5000/busybox
+The push refers to a repository [localhost.localdomain:5000/busybox] (len: 1)
+fef924a0204a: Pushed
+9a163e0b8d13: Pushed
+latest: digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893ba2de1dc size: 3202</code></pre></p>
+          </section>
+          <section>Let's see if we can retrieve this image back...</section>
+          <section>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            <code># removing the local copy of the buxybox:
+
+[root@dckrepc701s2 opt]$ docker rmi localhost.localdomain:5000/busybox
+Untagged: localhost.localdomain:5000/busybox:latest
+
+
+[root@dckrepc701s2 opt]$ docker rmi docker.io/busybox
+Untagged: docker.io/busybox:latest
+Deleted: fef924a0204a00b3ec67318e2ed337b189c99ea19e2bf10ed30a13b87c5e17ab
+Deleted: 9a163e0b8d138ec700b5a5f7e62509012f7eb34b9f86cd3bbeb3d183958114a9
+
+
+# checking our local images:
+[root@dckrepc701s2 opt]# docker images
+REPOSITORY                        TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+
+
+# No local images. Let's pull busybox from our private Docker Registry:
+
+[root@dckrepc701s2 opt]$ docker pull localhost.localdomain:5000/busybox
+Using default tag: latest
+Trying to pull repository localhost.localdomain:5000/busybox ... latest: Pulling from busybox
+9a163e0b8d13: Pull complete
+fef924a0204a: Pull complete
+Digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893ba2de1dc
+Status: Downloaded newer image for localhost.localdomain:5000/busybox:latest
+[root@dckrepc701s2 opt]$ docker images
+REPOSITORY                           TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
+docker.io/distribution/registry      latest              4c828131f8d1        11 weeks ago        666.4 MB</code></pre>
+          </section>
+          <section>Yay!<span class="fragment fade-up"> Job done!</span></section>
+          <section>Job done?</section>
+          <section>What's the contradiction?</section>
+          <section><p>We want the Docker Registry to be available on the server restart</p>
+            <p class="fragment fade-up">however currently we start it manually.</p>
+            <p class="fragment fade-up">Let's fix that.</p>
+          </section>
+					<section><p>Since we are on CentOS 7 we will use the Systemd approach.</p>
+            <p class="fragment fade-up">Let's create a unit file.</p>
+          </section>
+					<section data-transition="slide fade">
+						<p>/usr/lib/systemd/system/docker.registry.service</p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            	<code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/bin/docker stop -t 2 docker_registry
+ExecStartPre=-/bin/docker rm -f docker_registry
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/docker run -d -p 5000:5000 \
+        -v /opt/docker_data/registry:/var/lib/registry \
+        --name docker_registry \
+        --rm \
+        docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+					  </pre>
+            <p class="fragment fade-up">There are few interesting things there:<br>
+							<span class="fragment fade-up">We make sure that there is no existing instance of the Docker Register is running. </span>
+							<span class="fragment fade-up">Then we pull a fresh copy (if needed). </span>
+							<span class="fragment fade-up">Hence the ExecStartPre.</span>
+						</p>
+					</section>
+					<section data-transition="fade">
+						<p>/usr/lib/systemd/system/docker.registry.service</p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            	<code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/bin/docker stop -t 2 docker_registry
+ExecStartPre=-/bin/docker rm -f docker_registry
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/docker run -d -p 5000:5000 \
+        -v /opt/docker_data/registry:/var/lib/registry \
+        --name docker_registry \
+        --rm \
+        docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+					  </pre>
+            <p class="fragment fade-up">We use "=-" to ignore the non-zero exit code of ExecStartPre commands
+(in case there is no instance exists).<br>
+						<span class="fragment fade-up">ExecStart is exactly the same command as we run from the bash prompt.</span>
+</p>
+					</section>
+					<section data-transition="fade">
+						<p>/usr/lib/systemd/system/docker.registry.service</p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            	<code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/bin/docker stop -t 2 docker_registry
+ExecStartPre=-/bin/docker rm -f docker_registry
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/docker run -d -p 5000:5000 \
+        -v /opt/docker_data/registry:/var/lib/registry \
+        --name docker_registry \
+        --rm \
+        docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+					  </pre>
+            <p class="fragment fade-up">What will be the problem with this approach?</p>
+            <p class="fragment fade-up">
+							What behaviour we will see? (Hint: "Restart=always")
+						</p>
+            <p class="fragment fade-up">
+							What's the <span class="fragment highlight-red">contradiction</span>?
+						</p>
+					</section>
+					<section data-transition="fade">
+						<p>/usr/lib/systemd/system/docker.registry.service</p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            	<code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/bin/docker stop -t 2 docker_registry
+ExecStartPre=-/bin/docker rm -f docker_registry
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/docker run -d -p 5000:5000 \
+        -v /opt/docker_data/registry:/var/lib/registry \
+        --name docker_registry \
+        --rm \
+        docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+					  </pre>
+            <p class="fragment fade-up">
+							It will go into a start-stop loop.
+						</p>
+            <p class="fragment fade-up">
+							The contradiction here is between "Type=simple" and "-d". Let's eliminate it - either with "Type=forking" (and setting a "PIDFile") or remove "-d"
+						</p>
+					</section>
+					<section data-transition="slide fade">
+						<p>/usr/lib/systemd/system/docker.registry.service</p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            	<code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/bin/docker stop -t 2 docker_registry
+ExecStartPre=-/bin/docker rm -f docker_registry
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/docker run -p 5000:5000 \
+	     -v /opt/docker_data/registry:/var/lib/registry \
+			 --name docker_registry \
+			 --rm \
+			 docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+					  </pre>
+            <p class="fragment fade-up">
+							We removed '-d'.
+						</p>
+            <p class="fragment fade-up">
+							All good? <span class="fragment fade-up">No!</span>
+						</p>
+            <p class="fragment fade-up">
+							What's our next problem /contradiction?
+						</p>
+					</section>
+					<section data-transition="fade">
+						<p>/usr/lib/systemd/system/docker.registry.service</p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            	<code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=-/bin/docker stop -t 2 docker_registry
+ExecStartPre=-/bin/docker rm -f docker_registry
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/docker run -p 5000:5000 \
+	     -v /opt/docker_data/registry:/var/lib/registry \
+			 --name docker_registry \
+			 --rm \
+			 docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+					  </pre>
+            <p>
+							Systemd is supposed to mind the actual Docker Registry container, however it minds the docker client.
+I.e. if docker client dies, docker instance will continue to run.
+						</p>
+            <p class="fragment fade-up">
+							The contradiction is between docker client and systemd.
+						</p>
+					</section>
+					<section>
+						Let's fix that by using systemd-docker https://github.com/ibuildthecloud/systemd-docker
+					</section>
+					<section>
+						<p>
+							Install systemd-docker according to the README.md. I.e.
+						<ul>
+            	<li class="fragment fade-up">
+								Install golang
+							</li>
+            	<li class="fragment fade-up">
+								Set GOPATH env variable
+							</li>
+            	<li class="fragment fade-up">
+								Run "go get"
+							</li>
+            	<li class="fragment fade-up">
+								Copy the systemd-docker binary to /bin
+							</li>
+            	<li class="fragment fade-up">
+								Update docker.registry.service unit file.
+							</li>
+						</ul>
+						<p>
+					</section>
+					<section data-transition="fade">
+						<p>/usr/lib/systemd/system/docker.registry.service</p>
+            <pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+            	<code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+RestartSec=10      # &lt;- new
+Type=notify        # &lt;- new
+NotifyAccess=all   # &lt;- new
+ExecStartPre=-/bin/docker stop -t 2 docker_registry
+ExecStartPre=-/bin/docker rm -f docker_registry
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/systemd-docker --cgroups name=systemd run -p 5000:5000 \
+        -v /opt/docker_data/registry:/var/lib/registry \
+        --name %n \
+        --rm \
+        docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+					  </pre>
+            <p>
+							Now we can update the unit file as the above. Notice "Type=notify", "--name %n"
+						</p>
+					</section>
+					<section data-transition="fade">
+						<p>/usr/lib/systemd/system/docker.registry.service</p>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+							<code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+RestartSec=10      # &lt;- new
+Type=notify        # &lt;- new
+NotifyAccess=all   # &lt;- new
+ExecStartPre=-/bin/docker stop -t 2 docker_registry
+ExecStartPre=-/bin/docker rm -f docker_registry
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/systemd-docker --cgroups name=systemd run -p 5000:5000 \
+        -v /opt/docker_data/registry:/var/lib/registry \
+        --name %n \
+        --rm \
+        docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+						</pre>
+						<p>
+To run with the updated configuration do<br> "systemctl daemon-reload && systemctl restart docker.registry.service"
+						</p>
+					</section>
+        </section>
+				<section>
+					<section>
+						Now we are able to run the Docker Registry as a systemd service.
+					</section>
+					<section>
+						However what will happen if we try to use it remotely?
+					</section>
+					<section>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+		            <code>
+		# On a remote machine we first pulling an example image:
+		~ ❯ docker pull tianon/true
+		Using default tag: latest
+		latest: Pulling from tianon/true
+		03968484a678: Pull complete
+		Digest: sha256:6d495d81575686ab071b574367333914521491c7629af74bc72a6e33d0ed2b36
+		Status: Downloaded newer image for tianon/true:latest
+
+		# We tag it with the &lt;docker_reg_server_name:port&gt;/workspace/image_name
+		~ ❯ docker tag tianon/true dckrepc701s2.ext.s2.d1:5000/victoro/true
+
+		# Push 'true' to our private Docker Registry
+		~ ❯ docker push dckrepc701s2.ext.s2.d1:5000/victoro/true
+		The push refers to a repository [dckrepc701s2.ext.s2.d1:5000/victoro/true]
+		Get https://dckrepc701s2.ext.s2.d1:5000/v1/_ping: tls: oversized record received with length 20527
+	</code></pre>
+            <p class="fragment fade-up">
+							What has just happened? <span class="fragment fade-up">Why we see this error?</span>
+						</p>
+            <p class="fragment fade-up">
+							What is the <span class="fragment highlight-red">contradiction</span>?
+						</p>
+					</section>
+					<section>
+						<p>
+							We are trying to use an insecure registry.
+						</p>
+            <p class="fragment fade-up">
+							The contradiction is between the docker client,<br> which expects TLS
+						</p>
+            <p class="fragment fade-up">
+							and the server,<br> which is currently deployed with the plain HTTP.
+						</p>
+					</section>
+					<section>
+						<p>
+							We can bypass this issue by setting --insecure-registry flag in the DOCKER_OPTS
+						</p>
+            <p class="fragment fade-up">
+							Not a good idea.
+						</p>
+            <p class="fragment fade-up">
+							Or we implement TLS at the Docker Registry.
+						</p>
+					</section>
+					<section>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+		<code>
+[root@dckrepc701s2 opt]# mkdir -p /opt/certs &amp;&amp; cd /opt/certs
+[root@dckrepc701s2 certs]# openssl req -newkey rsa:4096 \
+&gt; -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt
+Generating a 4096 bit RSA private key
+...
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+...
+Country Name (2 letter code) [XX]:AU
+State or Province Name (full name) []:VIC
+Locality Name (eg, city) [Default City]:Melbourne
+Organization Name (eg, company) [Default Company Ltd]:Sportsbet
+Organizational Unit Name (eg, section) []:SOLAR
+Common Name (eg, your name or your server's hostname) []:dckrepc701s2.ext.s2.d1
+Email Address []:
+
+[root@dckrepc701s2 certs]# ls
+domain.crt&nbsp; domain.key</code></pre>
+            <p class="fragment fade-up">
+						  Here we are creating a self-signing certificate.
+						</p>
+					</section>
+					<section>
+						Next we need to update the unit file,
+						passing REGISTRY_HTTP_TLS_CERTIFICATE
+						and REGISTRY_HTTP_TLS_KEY environment variables to the Docker Registry instance.
+					</section>
+					<section>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+		<code>[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+RestartSec=10
+Type=notify
+NotifyAccess=all
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/systemd-docker --cgroups name=systemd run -p 5000:5000 \
+        -v /opt/docker_data/registry:/var/lib/registry \
+        -v /opt/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+        -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+        --name %n \
+        --rm \
+docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target</code></pre>
+					</section>
+					<section>
+						We test it locally first...
+					</section>
+					<section>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+		<code># copy our public key to the system CA list. On CentOS 7 it is:
+
+[root@dckrepc701s2 ~]$ cp /opt/certs/domain.crt  /etc/docker/certs.d/dckrepc701s2.ext.s2.d1:5000/ca.crt
+
+# Reload systemd and restart the Docker Registry service
+[root@dckrepc701s2 ~]$ systemctl daemon-reload &amp;&amp; systemctl restart docker.registry.service
+...
+
+[root@dckrepc701s2 ~]$ docker tag busybox dckrepc701s2.ext.s2.d1:5000/busybox
+
+[root@dckrepc701s2 ~]$ docker push localhost.localdomain:5000/busybox
+The push refers to a repository [localhost.localdomain:5000/busybox] (len: 1)
+fef924a0204a: Pushed
+9a163e0b8d13: Pushed
+latest: digest: sha256:241bf973af8196d58b3c439835fd37d5c773a42d496ffa00d8148893ba2de1dc size: 3202</code></pre>
+            <p class="fragment fade-up">
+						  It worked! <span class="fragment fade-up">However...</span>
+						</p>
+            <p class="fragment fade-up">
+						  Can you see a problem/contradiction with this setup?
+						</p>
+					</section>
+					<section>
+						<p>
+							We need to distribute our public key to each and every Docker client...
+						</p>
+            <p class="fragment fade-up">
+						  ... and it is even trickier with the docker-machine on Mac and Windows.
+						</p>
+					</section>
+					<section>
+						So the contradiction here is between that extra step required to update CA list<br>
+						and our desire to minimize the effort when setting up / maintaining  Docker
+					</section>
+					<section>
+						Let's eliminate it by using a proper CA-signed TLS certificate.
+					</section>
+					<section>
+						<p>Like this one:</p>
+						<p><img src="cert.png"></p>
+					</section>
+					<section>
+						<p>
+							Suppose I replaced the content of the domain.crt and domain.key, restarted docker.registry.service.
+					  </p>
+            <p class="fragment fade-up">
+						  However I still have the same TLS error as before.
+						</p>
+            <p class="fragment fade-up">
+						  What is the issue?
+						</p>
+					</section>
+					<section>
+						<p>
+							Our certificate is signed by the DigiCert via an intermediate DigiCert SHA2 Secure Server CA.
+					  </p>
+            <p class="fragment fade-up">
+						  The latter one is not included in the standard list of the Certification Authorities - hence the error.
+						</p>
+					</section>
+					<section>
+						<p>
+							Concatenating public key and the intermediate certificate in one .crt usually helps...
+					  </p>
+            <p class="fragment fade-up">
+						  But not in this case.
+							<span class="fragment fade-up"The Registry expects to see only the public key in REGISTRY_HTTP_TLS_CERTIFICATE.</span>
+						</p>
+            <p class="fragment fade-up">
+						  What's the solution?
+						</p>
+					</section>
+					<section>
+						Let's place an HTTPS reverse proxy in front of the Docker Registry.
+					</section>
+					<section>
+						We will be using the official NGINX docker image (https://hub.docker.com/_/nginx/)
+					</section>
+					<section>
+						<p>
+							<img src="diagram1.png"
+						</p>
+					</section>
+					<section>
+						<p>Here are the steps:
+						<ul>
+            	<li class="fragment fade-up">
+								Create a DNS entry as per the certificate CN
+							</li>
+            	<li class="fragment fade-up">
+								Obtain CA-signed certificate
+							</li>
+            	<li class="fragment fade-up">
+								On the Docker Registry server create /opt/docker_registry_nginx/certs directory and place CA-signed cert.pem/key.pem there.
+							</li>
+            	<li class="fragment fade-up">
+								If required (as in our example), obtain the intermediate certificate (i.e. DigiCert SHA2 Secure Server CA) , convert to PEM and append to the cert.pem
+							</li>
+            	<li class="fragment fade-up">
+								Create NGINX config file
+							</li>
+            	<li class="fragment fade-up">
+								Create docker.registry.nginx.service unit file
+							</li>
+						</p>
+			    </section>
+					<section>
+						<p>/opt/docker_registry_nginx/default.conf</p>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em; background:#404040;">
+upstream docker-registry { server registry:5000<span style="color:#cc7833">;</span> }
+upstream docker-ui { server ui:80<span style="color:#cc7833">;</span> }
+server {
+ listen 443 default_server<span style="color:#cc7833">;</span>
+ ssl on<span style="color:#cc7833">;</span>
+ ssl_certificate certs/cert.pem<span style="color:#cc7833">;</span>
+ ssl_certificate_key certs/key.pem<span style="color:#cc7833">;</span>
+ add_header Strict-Transport-Security <span style="color:#6c3">"max-age=31536000; includeSubdomains"</span><span style="color:#cc7833">;</span>
+ proxy_set_header Host       $http_host<span style="color:#cc7833">;</span>   <span style="color:#93c"># required for Docker client sake</span>
+ proxy_set_header X-Real-IP  $remote_addr<span style="color:#cc7833">;</span> <span style="color:#93c"># pass on real client IP</span>
+ client_max_body_size 0<span style="color:#cc7833">;</span> <span style="color:#93c"># disable any limits to avoid HTTP 413 for large image uploads</span>
+ chunked_transfer_encoding on<span style="color:#cc7833">;</span>
+ location /_ping { proxy_pass http://docker-registry<span style="color:#cc7833">;</span> }
+ location /v2/ {
+     <span style="color:#cc7833">if</span> ($http_user_agent <span style="color:#cc7833">~</span> <span style="color:#6c3">'^(docker\/1\.(3|4|5(?!\.[0-9]-dev))|Go ).*\$'</span>){
+       <span style="color:#cc7833">return</span> 404<span style="color:#cc7833">;</span>
+     }
+     add_header <span style="color:#6c3">'Docker-Distribution-Api-Version'</span> <span style="color:#6c3">'registry/2.0'</span> always<span style="color:#cc7833">;</span>
+     proxy_pass                          http://docker-registry<span style="color:#cc7833">;</span>
+     proxy_set_header  Host              $http_host<span style="color:#cc7833">;</span>   <span style="color:#93c"># required for docker client's sake</span>
+     proxy_set_header  X-Real-IP         $remote_addr<span style="color:#cc7833">;</span> <span style="color:#93c"># pass on real client's IP</span>
+     proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for<span style="color:#cc7833">;</span>
+     proxy_set_header  X-Forwarded-Proto $scheme<span style="color:#cc7833">;</span>
+     proxy_read_timeout                  900<span style="color:#cc7833">;</span>
+ }
+}
+						</pre>
+			    </section>
+					<section>
+						<p>/usr/lib/systemd/system/docker.registry.nginx.service:</p>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+							<code>
+[Unit]
+Description=HTTPS Proxy for the Docker Registry
+After=docker.registry.service, docker.registry.ui.service
+Requires=docker.registry.service, docker.registry.ui.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+RestartSec=10
+Type=notify
+NotifyAccess=all
+ExecStartPre=/bin/docker pull nginx
+ExecStart=-/bin/systemd-docker --cgroups name=systemd run -p 443:443 \
+          -v /opt/docker_registry_nginx/default.conf:/etc/nginx/conf.d/default.conf:ro \
+          -v /opt/docker_registry_nginx/certs:/etc/nginx/certs \
+          --link docker.registry.service:registry \
+          --link docker.registry.ui.service:ui \
+          --name %n \
+          --rm \
+          nginx
+[Install]
+WantedBy=multi-user.target
+							</code>
+						</pre>
+					</section>
+					<section>
+					<p>Next we update docker.registry.service unit file.</p>
+          <p class="fragment fade-up">
+					We need to remove
+				  </p>
+					<ul>
+            	<li class="fragment fade-up">
+								'-p', as we do not publish any ports from this container to the host anymore
+							</li>
+            	<li class="fragment fade-up">
+								TLS related '-v' and '-e' entries
+							</li>
+					</ul>
+					</section>
+					<section>
+						<p>Updated docker.registry.service:</p>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+		          <code>
+[Unit]
+Description=Docker Registry
+After=docker.service
+Requires=docker.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+RestartSec=10
+Type=notify
+NotifyAccess=all
+ExecStartPre=/bin/docker pull distribution/registry
+ExecStart=-/bin/systemd-docker --cgroups name=systemd run  \
+         -v /opt/docker_data/registry:/var/lib/registry \
+         --name %n \
+         --rm \
+         docker.io/distribution/registry
+[Install]
+WantedBy=multi-user.target
+							</code>
+						</pre>
+					</section>
+				  <section>
+						<p>Testing over HTTPS:</p>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+		             <code>
+[root@dckrepc701s2 ~]$ systemctl daemon-reload && systemctl enable docker.registry.nginx.service
+...
+[root@dckrepc701s2 ~]$ systemctl restart  docker.registry.service docker.registry.nginx.service
+...
+[root@dckrepc701s2 ~]$  docker pull tianon/true
+...
+[root@dckrepc701s2 ~]$ docker tag tianon/true dockerhub.sbetcorp.com.au:443/victor/true:myawsometag
+
+[root@dckrepc701s2 ~]$ docker push dockerhub.sbetcorp.com.au:443/victor/true:myawsometag
+The push refers to a repository [dockerhub.sbetcorp.com.au:443/victor/true]
+1c533ec919ee: Pushed
+...
+# removing local copy of 'true'
+[root@dckrepc701s2 ~]$ docker rmi dockerhub.sbetcorp.com.au:443/victor/true:myawsometag
+Untagged: dockerhub.sbetcorp.com.au:443/victor/true:myawsometag
+
+# pulling it from the repo
+[root@dckrepc701s2 ~]$ docker pull dockerhub.sbetcorp.com.au:443/victor/true:myawsometag
+myawsometag: Pulling from victor/true
+...
+Status: Downloaded newer image for dockerhub.sbetcorp.com.au:443/victor/true:myawsometag
+							</code>
+						</pre>
+				  </section>
+				</section>
+				<section>
+					<section>
+						Can anyone suggest what's our next issue / contradiction?
+					</section>
+					<section>
+						<p>At time of writing there was no easy way to search the local Docker Registry.</p>
+            <p class="fragment fade-up">
+							See https://github.com/docker/distribution/issues/206
+						</p>
+					</section>
+					<section>
+						<p>Therefore the contradiction is between<br>
+							<span class="fragment fade-up">the Registry functionality</span><br>
+							<span class="fragment fade-up">and our requirement to know which images are in there.
+						</p>
+					</section>
+				  <section>
+						<p>We eliminate the contradiction by extending the Docker Registry functionality<br>
+            <span class="fragment fade-up">with a Web UI.</span></p>
+					</section>
+				  <section>
+						We  will be using konradkleine/docker-registry-frontend for our docker.registry.ui.service.
+					</section>
+				  <section>
+						<img src="diagram2.png">
+					</section>
+				  <section>
+						<p>/usr/lib/systemd/system/docker.registry.ui.service unit file:</p>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+		            <code>
+[Unit]
+Description=Docker Registry Frontend
+After=docker.registry.service
+Requires=docker.registry.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+RestartSec=10
+Type=notify
+NotifyAccess=all
+ExecStartPre=/bin/docker pull konradkleine/docker-registry-frontend:v2
+ExecStart=-/bin/systemd-docker --cgroups name=systemd run -p 8080:80 \
+         -e ENV_DOCKER_REGISTRY_HOST=dckrepc701s2.ext.s2.d1 \
+         -e ENV_DOCKER_REGISTRY_PORT=5000 \
+         -e ENV_DOCKER_REGISTRY_USE_SSL=1 \
+         --name %n \
+         --rm \
+         konradkleine/docker-registry-frontend:v2
+[Install]
+WantedBy=multi-user.target
+							</code>
+						</pre>
+					</section>
+					<section>
+						<p>Updating NGINX config:
+							<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em; background:#404040;">
+upstream docker<span style="color:#ffffa0">-</span>ui {
+	server ui<span style="color:#ffffa0">:</span><span style="color:#22c0ff">80</span>;
+}
+...
+server {
+	listen <span style="color:#22c0ff">443</span> default_server;
+  <span style="color:#ffffa0">...</span>
+  location <span style="color:#ffffa0">/</span> {
+		proxy_pass http<span style="color:#ffffa0">:</span><span style="color:#ffffa0">/</span><span style="color:#ffffa0">/</span>docker<span style="color:#ffffa0">-</span>ui;
+	}
+  <span style="color:#ffffa0">...</span>
+}
+<span style="color:#ffffa0">...</span>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>Updating docker.registry.nginx.service unit file:</p>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+							<code>
+[Unit]
+Description=HTTPS Proxy for the Docker Registry
+After=docker.registry.service docker.registry.ui.service
+Requires=docker.registry.service docker.registry.ui.service
+[Service]
+TimeoutStartSec=0
+Restart=always
+RestartSec=10
+Type=notify
+NotifyAccess=all
+ExecStartPre=/bin/docker pull nginx
+ExecStart=-/bin/systemd-docker --cgroups name=systemd run -p 443:443 \
+        -v /data/docker_registry_nginx/default.conf:/etc/nginx/conf.d/default.conf:ro \
+        -v /data/docker_registry_nginx/certs:/etc/nginx/certs \
+        -v /data/www/vagrant:/www/data \
+        --link docker.registry.service:registry \
+        --link docker.registry.ui.service:ui \
+        --name %n \
+        --rm \
+        nginx
+
+[Install]
+WantedBy=multi-user.target
+							</code>
+						</pre>
+					</section>
+				  <section>
+						<p>Enabling and starting docker.registry.ui.service</p>
+						<pre style="width: 100%;border: none;box-shadow: none;font-size: 0.35em">
+							<code>
+[root@dckrepc701s2 ~]$ systemctl enable docker.registry.ui.service
+Created symlink from /etc/systemd/system/multi-user.target.wants/docker.registry.ui.service to /usr/lib/systemd/system/docker.registry.ui.service.
+
+[root@dckrepc701s2 ~]$ systemctl start docker.registry.ui.service
+
+[root@dckrepc701s2 ~]$ systemctl status docker.registry.ui.service
+? docker.registry.ui.service - Docker Registry Frontend
+Loaded: loaded (/usr/lib/systemd/system/docker.registry.ui.service; enabled; vendor preset: disabled)
+Active: active (running) since Wed 2016-03-02 12:26:46 ACST; 22s ago
+...
+							</code>
+						</pre>
+					</section>
+					<section>
+						<p>Now we can browse to https://dockerhub.sbetcorp.com.au:</p>
+					</section>
+					<section>
+						<img src="ui1.png">
+					</section>
+					<section>
+						<img src="ui2.png">
+					</section>
+					<section>
+						<img src="ui3.png">
+					</section>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
