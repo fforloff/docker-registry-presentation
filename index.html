@@ -25,6 +25,13 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
+					<section>
+						<h2>Setting up your own Docker Local/Private Registry</h2>
+					</section>
+				  <section><p>This presentation is build with Revealjs</p>
+						<p class="fragment fade-up">It runs in the docker container</p>
+						<p class="fragment fade-up"><a href="https://github.com/fforloff/docker-registry-presentation">https://github.com/fforloff/docker-registry-presentation</a></p>
+					</section>
 				  <section>Hi</section>
 				  <section>I am Victor</section>
           <section><p>I work at</p>
@@ -541,7 +548,7 @@ To run with the updated configuration do<br> "systemctl daemon-reload && systemc
 					</section>
 					<section data-transition="fade">
             <p>
-							The contradiction is between the docker client, which expects TLS<br>
+							The contradiction is between the docker engine, which expects TLS<br>
             <span class="fragment fade-up">and the Registry server, which is currently deployed with the plain old HTTP</span>
 						</p>
 					</section>
@@ -776,7 +783,6 @@ ExecStart=-/bin/systemd-docker --cgroups name=systemd run -p 443:443 \
           -v /opt/docker_registry_nginx/default.conf:/etc/nginx/conf.d/default.conf:ro \
           -v /opt/docker_registry_nginx/certs:/etc/nginx/certs \
           --link docker.registry.service:registry \
-          --link docker.registry.ui.service:ui \
           --name %n \
           --rm \
           nginx
